@@ -29,6 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zybooks.pizzaparty.ui.theme.PizzaPartyTheme
+import kotlin.math.ceil
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,6 +50,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun PizzaPartyScreen(modifier: Modifier = Modifier) {
     var totalPizzas by remember { mutableIntStateOf(0) }
+    var numPeopleInput by remember { mutableStateOf("") }
+    var hungerLevel by remember { mutableStateOf("Medium") }
 
     Column(
         modifier = modifier.padding(10.dp)
@@ -59,12 +62,16 @@ fun PizzaPartyScreen(modifier: Modifier = Modifier) {
             modifier = modifier.padding(bottom = 16.dp)
         )
         NumberField(
+            textInput = numPeopleInput,
+            onValueChange = { numPeopleInput = it },
             labelText = "Number of people?",
             modifier = modifier.padding(bottom = 16.dp).fillMaxWidth()
         )
         RadioGroup(
             labelText = "How hungry?",
             radioOptions = listOf("Light", "Medium", "Ravenous"),
+            selectedOption = hungerLevel,
+            onSelected = { hungerLevel = it },
             selectedValue = "Medium",
             modifier = modifier
         )
@@ -76,6 +83,7 @@ fun PizzaPartyScreen(modifier: Modifier = Modifier) {
         Button(
             onClick = {
                 // Not implemented yet
+                totalPizzas = calculateNumPizzas(numPeopleInput.toInt(), hungerLevel)
             },
             modifier = modifier.fillMaxWidth()
         ) {
@@ -87,6 +95,9 @@ fun PizzaPartyScreen(modifier: Modifier = Modifier) {
 @Composable
 fun NumberField(
     labelText: String,
+    textInput: String,
+    onValueChange: (String) -> Unit,
+
     modifier: Modifier = Modifier
 ) {
     // Not implemented yet
@@ -94,7 +105,7 @@ fun NumberField(
 
     TextField(
         value = textInput,
-        onValueChange = { textInput = it },
+        onValueChange = onValueChange,
         label = { Text(labelText) },
         singleLine = true,
         keyboardOptions = KeyboardOptions(
@@ -108,6 +119,8 @@ fun NumberField(
 fun RadioGroup(
     labelText: String,
     radioOptions: List<String>,
+    selectedOption: String,
+    onSelected: (String) -> Unit,
     selectedValue: String,
     modifier: Modifier = Modifier
 ) {
@@ -122,7 +135,7 @@ fun RadioGroup(
                 modifier = modifier
                     .selectable(
                         selected = isSelectedOption(option),
-                        onClick = { selectedOption = option },
+                        onClick = { onSelected(option) },
                         role = Role.RadioButton
                     )
                     .padding(8.dp)
@@ -139,6 +152,20 @@ fun RadioGroup(
             }
         }
     }
+}
+
+fun calculateNumPizzas(
+    numPeople: Int,
+    hungerLevel: String
+): Int {
+    val slicesPerPizza = 8
+    val slicesPerPerson = when (hungerLevel) {
+        "Light" -> 2
+        "Medium" -> 3
+        else -> 4
+    }
+
+    return ceil(numPeople * slicesPerPerson / slicesPerPizza.toDouble()).toInt()
 }
 
 @Preview(showBackground = true)
