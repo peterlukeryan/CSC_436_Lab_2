@@ -101,7 +101,6 @@ fun NumberField(
     modifier: Modifier = Modifier
 ) {
     // Not implemented yet
-    var textInput by remember { mutableStateOf("") }
 
     TextField(
         value = textInput,
@@ -125,7 +124,7 @@ fun RadioGroup(
     modifier: Modifier = Modifier
 ) {
     // Not implemented yet
-    var selectedOption by remember { mutableStateOf(selectedValue) }
+
     val isSelectedOption: (String) -> Boolean = { selectedOption == it }
 
     Column {
